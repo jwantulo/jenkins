@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.6.4">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <url>https://github.com/Klowd/klowd-cucumber/</url>
+        <credentialsId>d04aca1c-6510-4800-b9a9-ee92ed39b030</credentialsId>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/master</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="list"/>
+    <extensions/>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers>
+    <hudson.triggers.TimerTrigger>
+      <spec>44 H/6 * * *</spec>
+    </hudson.triggers.TimerTrigger>
+  </triggers>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>Xvfb :99 -ac -screen 0 1280x1024x24 &amp;
+export DISPLAY=:99
+nice -n 10 x11vnc 2&gt;&amp;1 &amp;
+
+gem install bundler
+cd Cumulus
+bundle install
+
+cucumber --tags @regression --tags ~@wip --tags ~@manual --format json -o cucumber.json</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <net.masterthought.jenkins.CucumberReportPublisher plugin="cucumber-reports@3.12.1">
+      <fileIncludePattern>cucumber.json</fileIncludePattern>
+      <fileExcludePattern></fileExcludePattern>
+      <jsonReportDirectory>Cumulus</jsonReportDirectory>
+      <failedStepsNumber>0</failedStepsNumber>
+      <skippedStepsNumber>0</skippedStepsNumber>
+      <pendingStepsNumber>0</pendingStepsNumber>
+      <undefinedStepsNumber>0</undefinedStepsNumber>
+      <failedScenariosNumber>0</failedScenariosNumber>
+      <failedFeaturesNumber>0</failedFeaturesNumber>
+      <trendsLimit>0</trendsLimit>
+      <parallelTesting>false</parallelTesting>
+      <sortingMethod>ALPHABETICAL</sortingMethod>
+      <classifications class="empty-list"/>
+      <classificationsFilePattern></classificationsFilePattern>
+    </net.masterthought.jenkins.CucumberReportPublisher>
+  </publishers>
+  <buildWrappers/>
+</project>

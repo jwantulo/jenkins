@@ -1,0 +1,122 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.6.4">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <url>https://github.com/Klowd/klowd-cucumber</url>
+        <credentialsId>d04aca1c-6510-4800-b9a9-ee92ed39b030</credentialsId>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/master</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="list"/>
+    <extensions/>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers>
+    <hudson.triggers.TimerTrigger>
+      <spec>14 H/6 * * *</spec>
+    </hudson.triggers.TimerTrigger>
+  </triggers>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <CodeBuilder plugin="aws-codebuild@0.17">
+      <credentialsType>keys</credentialsType>
+      <credentialsId></credentialsId>
+      <proxyHost></proxyHost>
+      <proxyPort></proxyPort>
+      <awsAccessKey>AKIAIZWNDJLUMJQ3HD5A</awsAccessKey>
+      <awsSecretKey>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</awsSecretKey>
+      <region>us-east-1</region>
+      <projectName>BuildFXPtouch</projectName>
+      <sourceControlType>project</sourceControlType>
+      <sourceVersion></sourceVersion>
+      <sseAlgorithm></sseAlgorithm>
+      <artifactTypeOverride>NO_ARTIFACTS</artifactTypeOverride>
+      <artifactLocationOverride></artifactLocationOverride>
+      <artifactNameOverride></artifactNameOverride>
+      <artifactNamespaceOverride></artifactNamespaceOverride>
+      <artifactPackagingOverride></artifactPackagingOverride>
+      <artifactPathOverride></artifactPathOverride>
+      <envVariables></envVariables>
+      <envParameters></envParameters>
+      <buildSpecFile></buildSpecFile>
+      <buildTimeoutOverride></buildTimeoutOverride>
+      <codeBuildResult>
+        <status>IN_PROGRESS</status>
+      </codeBuildResult>
+      <isPipelineBuild>false</isPipelineBuild>
+    </CodeBuilder>
+    <hudson.tasks.Shell>
+      <command>Xvfb :99 -ac -screen 0 1280x1024x24 &amp;
+export DISPLAY=:99
+nice -n 10 x11vnc 2&gt;&amp;1 &amp;
+
+gem install bundler
+cd FXPTouch
+bundle install
+
+cucumber --tags @regression --tags ~@wip --format json -o cucumber.json
+</command>
+    </hudson.tasks.Shell>
+    <ruby-proxy-object>
+      <ruby-object ruby-class="Jenkins::Tasks::BuilderProxy" pluginid="cucumber">
+        <object ruby-class="CucumberBuilder" pluginid="cucumber">
+          <color__output ruby-class="FalseClass" pluginid="cucumber"/>
+          <browser pluginid="cucumber" ruby-class="String">chrome</browser>
+          <display pluginid="cucumber" ruby-class="String"></display>
+          <cucumber__dir pluginid="cucumber" ruby-class="String">FXPTouch</cucumber__dir>
+          <verbosity reference="../color__output"/>
+          <enabled reference="../color__output"/>
+          <cucumber__profile pluginid="cucumber" ruby-class="String">--tags @regression</cucumber__profile>
+        </object>
+        <pluginid pluginid="cucumber" ruby-class="String">cucumber</pluginid>
+      </ruby-object>
+    </ruby-proxy-object>
+  </builders>
+  <publishers>
+    <net.masterthought.jenkins.CucumberReportPublisher plugin="cucumber-reports@3.12.1">
+      <fileIncludePattern>cucumber.json</fileIncludePattern>
+      <fileExcludePattern></fileExcludePattern>
+      <jsonReportDirectory>FXPTouch</jsonReportDirectory>
+      <failedStepsNumber>0</failedStepsNumber>
+      <skippedStepsNumber>0</skippedStepsNumber>
+      <pendingStepsNumber>0</pendingStepsNumber>
+      <undefinedStepsNumber>0</undefinedStepsNumber>
+      <failedScenariosNumber>0</failedScenariosNumber>
+      <failedFeaturesNumber>0</failedFeaturesNumber>
+      <trendsLimit>240</trendsLimit>
+      <parallelTesting>false</parallelTesting>
+      <sortingMethod>ALPHABETICAL</sortingMethod>
+      <classifications class="empty-list"/>
+      <classificationsFilePattern></classificationsFilePattern>
+    </net.masterthought.jenkins.CucumberReportPublisher>
+    <hudson.tasks.Mailer plugin="mailer@1.20">
+      <recipients>john.wantulok@klowd.com</recipients>
+      <dontNotifyEveryUnstableBuild>false</dontNotifyEveryUnstableBuild>
+      <sendToIndividuals>false</sendToIndividuals>
+    </hudson.tasks.Mailer>
+  </publishers>
+  <buildWrappers>
+    <ruby-proxy-object>
+      <ruby-object ruby-class="Jenkins::Tasks::BuildWrapperProxy" pluginid="rvm">
+        <object ruby-class="RvmWrapper" pluginid="rvm">
+          <impl pluginid="rvm" ruby-class="String">&apos;2.4.1&apos;</impl>
+        </object>
+        <pluginid pluginid="rvm" ruby-class="String">rvm</pluginid>
+      </ruby-object>
+    </ruby-proxy-object>
+  </buildWrappers>
+</project>
